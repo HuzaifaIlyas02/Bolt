@@ -11,13 +11,13 @@ const Page = () => {
 
   // Define the types for data, input variables (void in this case), and error
   trpc.authCallback.useQuery(undefined, {
-    onSuccess: ({ success }) => {
+    onSuccess: ({ success }: { success: boolean }) => {
       if (success) {
         // user is synced to db
         router.push(origin ? `/${origin}` : "/dashboard");
       }
     },
-    onError: (err) => {
+    onError: (err: { data: { code: string } }) => {
       if (err.data?.code === "UNAUTHORIZED") {
         router.push("/sign-in");
       }
