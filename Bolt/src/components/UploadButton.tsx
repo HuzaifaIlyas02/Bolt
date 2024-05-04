@@ -39,7 +39,7 @@ const UploadDropzone = () => {
         }
         return prevProgress + 5;
       });
-    }, 1000);
+    }, 500);
 
     return interval;
   };
@@ -56,7 +56,7 @@ const UploadDropzone = () => {
 
         if (!res) {
           return toast({
-            title: "Somethinf went wrong",
+            title: "Something went wrong",
             description: "Please try again",
             variant: "destructive",
           });
@@ -68,7 +68,7 @@ const UploadDropzone = () => {
 
         if (!key) {
           return toast({
-            title: "Somethinf went wrong",
+            title: "Something went wrong",
             description: "Please try again",
             variant: "destructive",
           });

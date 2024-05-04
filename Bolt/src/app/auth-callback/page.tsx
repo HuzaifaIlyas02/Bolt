@@ -9,22 +9,25 @@ const Page = () => {
   const searchParams = useSearchParams();
   const origin = searchParams.get("origin");
 
-  // Define the types for data, input variables (void in this case), and error
-  trpc.authCallback.useQuery(undefined, {
-    onSuccess: ({ success }: { success: boolean }) => {
-      if (success) {
-        // user is synced to db
-        router.push(origin ? `/${origin}` : "/dashboard");
-      }
-    },
-    onError: (err: { data: { code: string } }) => {
-      if (err.data?.code === "UNAUTHORIZED") {
-        router.push("/sign-in");
-      }
-    },
-    retry: true,
-    retryDelay: 500,
-  });
+  const { data: authData, error: authError } = trpc.authCallback.useQuery(
+    undefined,
+    {
+      retry: true,
+      retryDelay: 500,
+    }
+  );
+
+  if (authError) {
+    if (authError.data?.code === "UNAUTHORIZED") {
+      router.push("/sign-in");
+    }
+    return null; // or some error handling component
+  }
+
+  if (authData && authData.success) {
+    router.push(origin ? `/${origin}` : "/dashboard");
+    return null; // or some loading component
+  }
 
   return (
     <div className="w-full mt-24 flex justify-center">
