@@ -1,10 +1,10 @@
 import { db } from "@/db";
 import { openai } from "@/lib/openai";
-import { pc } from "@/lib/pinecone";
+import { getPineconeClient } from "@/lib/pinecone";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { PineconeStore } from "@langchain/pinecone"; // Import Index
 import { NextRequest } from "next/server";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 
@@ -16,6 +16,8 @@ export const POST = async (req: NextRequest) => {
   const { getUser } = getKindeServerSession();
 
   const user = await getUser();
+
+  if (!user) return new Response("Unauthorized", { status: 401 });
 
   const { id: userId } = user;
 
@@ -46,8 +48,9 @@ export const POST = async (req: NextRequest) => {
     openAIApiKey: process.env.OPENAI_API_KEY,
   });
 
-  const pinecone = await pc;
+  const pinecone = await getPineconeClient();
   const pineconeIndex = pinecone.Index("bolt");
+  console.log("pineconeIndex", pineconeIndex);
 
   const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
     pineconeIndex,
