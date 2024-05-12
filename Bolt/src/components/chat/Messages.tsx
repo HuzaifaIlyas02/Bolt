@@ -1,5 +1,5 @@
 import { trpc } from "@/app/_trpc/client";
-import { INFINTE_QUERY_LIMIT } from "@/config/infinite-query";
+import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query";
 import { Loader2, MessageSquare } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import Message from "./Message";
@@ -17,7 +17,7 @@ const Messages = ({ fileId }: MessagesProps) => {
     trpc.getFileMessages.useInfiniteQuery(
       {
         fileId,
-        limit: INFINTE_QUERY_LIMIT,
+        limit: INFINITE_QUERY_LIMIT,
       },
       {
         getNextPageParam: (lastPage) => lastPage?.nextCursor,

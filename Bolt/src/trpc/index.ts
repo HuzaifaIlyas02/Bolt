@@ -3,7 +3,7 @@ import { privateProcedure, publicProcedure, router } from "./trpc";
 import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
 import { z } from "zod";
-import { INFINTE_QUERY_LIMIT } from "@/config/infinite-query";
+import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query";
 import { absoluteUrl } from "@/lib/utils";
 import { getUserSubscriptionPlan, stripe } from "@/lib/stripe";
 import { PLANS } from "@/config/stripe";
@@ -11,7 +11,6 @@ import { PLANS } from "@/config/stripe";
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession();
-
     const user = await getUser();
 
     if (!user || !user.id || !user.email)
@@ -25,7 +24,7 @@ export const appRouter = router({
     });
 
     if (!dbUser) {
-      // create new user in db
+      // create user in db
       await db.user.create({
         data: {
           id: user.id,
@@ -36,7 +35,6 @@ export const appRouter = router({
 
     return { success: true };
   }),
-
   getUserFiles: privateProcedure.query(async ({ ctx }) => {
     const { userId } = ctx;
 
@@ -47,8 +45,9 @@ export const appRouter = router({
     });
   }),
 
-  createStripSession: privateProcedure.mutation(async ({ ctx }) => {
+  createStripeSession: privateProcedure.mutation(async ({ ctx }) => {
     const { userId } = ctx;
+
     const billingUrl = absoluteUrl("/dashboard/billing");
 
     if (!userId) throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -68,6 +67,7 @@ export const appRouter = router({
         customer: dbUser.stripeCustomerId,
         return_url: billingUrl,
       });
+
       return { url: stripeSession.url };
     }
 
@@ -87,6 +87,7 @@ export const appRouter = router({
         userId: userId,
       },
     });
+
     return { url: stripeSession.url };
   }),
 
@@ -100,8 +101,8 @@ export const appRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const { userId } = ctx;
-      const { cursor, fileId } = input;
-      const limit = input.limit ?? INFINTE_QUERY_LIMIT;
+      const { fileId, cursor } = input;
+      const limit = input.limit ?? INFINITE_QUERY_LIMIT;
 
       const file = await db.file.findFirst({
         where: {
@@ -192,7 +193,9 @@ export const appRouter = router({
           id: input.id,
         },
       });
+
       return file;
     }),
 });
+
 export type AppRouter = typeof appRouter;
