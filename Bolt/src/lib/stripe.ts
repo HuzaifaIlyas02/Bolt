@@ -12,7 +12,7 @@ export async function getUserSubscriptionPlan() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
-  if (!user.id) {
+  if (!user || !user.id) {
     return {
       ...PLANS[0],
       isSubscribed: false,
@@ -43,7 +43,7 @@ export async function getUserSubscriptionPlan() {
   );
 
   const plan = isSubscribed
-    ? PLANS.find((plan) => plan.price.priceIds.test === dbUser.stripePriceId)
+    ? PLANS.find((plan) => plan.price.priceId.test === dbUser.stripePriceId)
     : null;
 
   let isCanceled = false;
