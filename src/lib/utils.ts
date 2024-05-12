@@ -14,7 +14,7 @@ export function absoluteUrl(path: string) {
 
 export function constructMetadata({
   title = "Bolt - the SaaS for students",
-  description = "Bolt is an open-source software to make chatting to your PDF files easy",
+  description = "Bolt is an open-source software to make chatting to your PDF files easy.",
   image = "/thumbnail.png",
   icons = "/favicon.ico",
   noIndex = false,
@@ -45,8 +45,8 @@ export function constructMetadata({
       creator: "@m_huzaifa_25",
     },
     icons,
-    metadataBase: new URL("https://localhost:3000"),
-    // themeColor: "#FFF",
+    metadataBase: new URL("https://Bolt-jet.vercel.app"),
+    themeColor: "#FFF",
     ...(noIndex && {
       robots: {
         index: false,

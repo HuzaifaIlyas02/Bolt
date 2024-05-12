@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
+
 import Dropzone from "react-dropzone";
 import { Cloud, File, Loader2 } from "lucide-react";
 import { Progress } from "./ui/progress";
@@ -13,9 +14,9 @@ import { useRouter } from "next/navigation";
 
 const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const router = useRouter();
+
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-
   const { toast } = useToast();
 
   const { startUpload } = useUploadThing(
@@ -32,11 +33,11 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
 
   const startSimulatedProgress = () => {
     setUploadProgress(0);
+
     const interval = setInterval(() => {
       setUploadProgress((prevProgress) => {
         if (prevProgress >= 95) {
           clearInterval(interval);
-          // setIsUploading(false);
           return prevProgress;
         }
         return prevProgress + 5;
@@ -51,15 +52,16 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
       multiple={false}
       onDrop={async (acceptedFile) => {
         setIsUploading(true);
+
         const progressInterval = startSimulatedProgress();
 
-        // handle file upload
+        // handle file uploading
         const res = await startUpload(acceptedFile);
 
         if (!res) {
           return toast({
             title: "Something went wrong",
-            description: "Please try again",
+            description: "Please try again later",
             variant: "destructive",
           });
         }
@@ -71,13 +73,14 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
         if (!key) {
           return toast({
             title: "Something went wrong",
-            description: "Please try again",
+            description: "Please try again later",
             variant: "destructive",
           });
         }
 
         clearInterval(progressInterval);
         setUploadProgress(100);
+
         startPolling({ key });
       }}
     >
@@ -94,7 +97,7 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Cloud className="h-6 w-6 text-zinc-500 mb-2" />
                 <p className="mb-2 text-sm text-zinc-700">
-                  <span className="font-semibold">Click to Upload</span> or drag
+                  <span className="font-semibold">Click to upload</span> or drag
                   and drop
                 </p>
                 <p className="text-xs text-zinc-500">
@@ -136,7 +139,7 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
                 type="file"
                 id="dropzone-file"
                 className="hidden"
-              ></input>
+              />
             </label>
           </div>
         </div>

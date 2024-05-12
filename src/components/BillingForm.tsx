@@ -21,18 +21,21 @@ interface BillingFormProps {
 
 const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
   const { toast } = useToast();
-  const { mutate: createStripeSession } = trpc.createStripeSession.useMutation({
-    onSuccess: ({ url }) => {
-      if (url) window.location.href = url;
-      if (!url) {
-        toast({
-          title: "There was a problem",
-          description: "Please try again later",
-          variant: "destructive",
-        });
-      }
-    },
-  });
+
+  const { mutate: createStripeSession, isLoading } =
+    trpc.createStripeSession.useMutation({
+      onSuccess: ({ url }) => {
+        if (url) window.location.href = url;
+        if (!url) {
+          toast({
+            title: "There was a problem...",
+            description: "Please try again in a moment",
+            variant: "destructive",
+          });
+        }
+      },
+    });
+
   return (
     <MaxWidthWrapper className="max-w-5xl">
       <form
@@ -46,27 +49,28 @@ const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
           <CardHeader>
             <CardTitle>Subscription Plan</CardTitle>
             <CardDescription>
-              You are currently on the <strong>{subscriptionPlan.name}</strong>
-              Plan.
+              You are currently on the <strong>{subscriptionPlan.name}</strong>{" "}
+              plan.
             </CardDescription>
           </CardHeader>
+
           <CardFooter className="flex flex-col items-start space-y-2 md:flex-row md:justify-between md:space-x-0">
             <Button type="submit">
-              <Loader2 className="mr-4 h-4 w-4 animate-spin" />
+              {isLoading ? (
+                <Loader2 className="mr-4 h-4 w-4 animate-spin" />
+              ) : null}
               {subscriptionPlan.isSubscribed
                 ? "Manage Subscription"
-                : "Upgrade to Pro"}
+                : "Upgrade to PRO"}
             </Button>
 
             {subscriptionPlan.isSubscribed ? (
               <p className="rounded-full text-xs font-medium">
                 {subscriptionPlan.isCanceled
-                  ? "Your Plan will be cancelled on "
-                  : "Your plan renew on "}
-                {format(
-                  subscriptionPlan.stripeCurrentPeriodEnd!,
-                  "MM dd, yyyy"
-                )}
+                  ? "Your plan will be canceled on "
+                  : "Your plan renews on"}
+                {format(subscriptionPlan.stripeCurrentPeriodEnd!, "dd.MM.yyyy")}
+                .
               </p>
             ) : null}
           </CardFooter>

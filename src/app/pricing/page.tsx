@@ -13,9 +13,9 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ArrowRight, Check, HelpCircle, Minus } from "lucide-react";
 import Link from "next/link";
 
-const Page = async () => {
+const Page = () => {
   const { getUser } = getKindeServerSession();
-  const user = await getUser();
+  const user = getUser();
 
   const pricingItems = [
     {
@@ -89,6 +89,7 @@ const Page = async () => {
               const price =
                 PLANS.find((p) => p.slug === plan.toLowerCase())?.price
                   .amount || 0;
+
               return (
                 <div
                   key={plan}
@@ -100,9 +101,10 @@ const Page = async () => {
                 >
                   {plan === "Pro" && (
                     <div className="absolute -top-5 left-0 right-0 mx-auto w-32 rounded-full bg-gradient-to-r from-orange-600 to-yellow-600 px-3 py-2 text-sm font-medium text-white">
-                      Upgrade Now
+                      Upgrade now
                     </div>
                   )}
+
                   <div className="p-5">
                     <h3 className="my-3 text-center font-display text-3xl font-bold">
                       {plan}
@@ -113,16 +115,14 @@ const Page = async () => {
                     </p>
                     <p className="text-gray-500">per month</p>
                   </div>
+
                   <div className="flex h-20 items-center justify-center border-b border-t border-gray-200 bg-gray-50">
                     <div className="flex items-center space-x-1">
                       <p>{quota.toLocaleString()} PDFs/mo included</p>
 
                       <Tooltip delayDuration={300}>
                         <TooltipTrigger className="cursor-default ml-1.5">
-                          <HelpCircle
-                            size={16}
-                            className=" h-4 w-4 text-zinc-500"
-                          />
+                          <HelpCircle className="h-4 w-4 text-zinc-500" />
                         </TooltipTrigger>
                         <TooltipContent className="w-80 p-2">
                           How many PDFs you can upload per month.
@@ -144,18 +144,15 @@ const Page = async () => {
                         {footnote ? (
                           <div className="flex items-center space-x-1">
                             <p
-                              className={cn("text-gray-400", {
-                                "text-gray-600": negative,
+                              className={cn("text-gray-600", {
+                                "text-gray-400": negative,
                               })}
                             >
                               {text}
                             </p>
                             <Tooltip delayDuration={300}>
                               <TooltipTrigger className="cursor-default ml-1.5">
-                                <HelpCircle
-                                  size={16}
-                                  className=" h-4 w-4 text-zinc-500"
-                                />
+                                <HelpCircle className="h-4 w-4 text-zinc-500" />
                               </TooltipTrigger>
                               <TooltipContent className="w-80 p-2">
                                 {footnote}
@@ -164,8 +161,8 @@ const Page = async () => {
                           </div>
                         ) : (
                           <p
-                            className={cn("text-gray-400", {
-                              "text-gray-600": negative,
+                            className={cn("text-gray-600", {
+                              "text-gray-400": negative,
                             })}
                           >
                             {text}
@@ -184,7 +181,7 @@ const Page = async () => {
                           variant: "secondary",
                         })}
                       >
-                        {user ? "Upgrade Now" : "Sign Up"}
+                        {user ? "Upgrade now" : "Sign up"}
                         <ArrowRight className="h-5 w-5 ml-1.5" />
                       </Link>
                     ) : user ? (
@@ -196,7 +193,7 @@ const Page = async () => {
                           className: "w-full",
                         })}
                       >
-                        {user ? "Upgrade Now" : "Sign Up"}
+                        {user ? "Upgrade now" : "Sign up"}
                         <ArrowRight className="h-5 w-5 ml-1.5" />
                       </Link>
                     )}

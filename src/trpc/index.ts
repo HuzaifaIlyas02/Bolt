@@ -11,10 +11,9 @@ import { PLANS } from "@/config/stripe";
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession();
-    const user = await getUser();
+    const user = getUser();
 
-    if (!user || !user.id || !user.email)
-      throw new TRPCError({ code: "UNAUTHORIZED" });
+    if (!user.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
 
     // check if the user is in the database
     const dbUser = await db.user.findFirst({
@@ -79,7 +78,7 @@ export const appRouter = router({
       billing_address_collection: "auto",
       line_items: [
         {
-          price: PLANS.find((plan) => plan.name === "Pro")?.price.priceId.test,
+          price: PLANS.find((plan) => plan.name === "Pro")?.price.priceIds.test,
           quantity: 1,
         },
       ],

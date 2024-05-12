@@ -3,21 +3,19 @@ import { openai } from "@/lib/openai";
 import { getPineconeClient } from "@/lib/pinecone";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { PineconeStore } from "@langchain/pinecone"; // Import Index
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { PineconeStore } from "langchain/vectorstores/pinecone";
 import { NextRequest } from "next/server";
+
 import { OpenAIStream, StreamingTextResponse } from "ai";
 
 export const POST = async (req: NextRequest) => {
-  //endpoint for asking a question for a PDF file
+  // endpoint for asking a question to a pdf file
 
   const body = await req.json();
 
   const { getUser } = getKindeServerSession();
-
-  const user = await getUser();
-
-  if (!user) return new Response("Unauthorized", { status: 401 });
+  const user = getUser();
 
   const { id: userId } = user;
 
@@ -32,7 +30,7 @@ export const POST = async (req: NextRequest) => {
     },
   });
 
-  if (!file) return new Response("Not Found", { status: 404 });
+  if (!file) return new Response("Not found", { status: 404 });
 
   await db.message.create({
     data: {
@@ -42,15 +40,14 @@ export const POST = async (req: NextRequest) => {
       fileId,
     },
   });
-  // 1: vectorize the message
 
+  // 1: vectorize message
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env.OPENAI_API_KEY,
   });
 
   const pinecone = await getPineconeClient();
   const pineconeIndex = pinecone.Index("bolt");
-  console.log("pineconeIndex", pineconeIndex);
 
   const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
     pineconeIndex,
@@ -69,9 +66,9 @@ export const POST = async (req: NextRequest) => {
     take: 6,
   });
 
-  const formattedPrevMessages = prevMessages.map((mesg) => ({
-    role: mesg.isUserMessage ? ("user" as const) : ("Bot" as const),
-    content: mesg.text,
+  const formattedPrevMessages = prevMessages.map((msg) => ({
+    role: msg.isUserMessage ? ("user" as const) : ("assistant" as const),
+    content: msg.text,
   }));
 
   const response = await openai.chat.completions.create({

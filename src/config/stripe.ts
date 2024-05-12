@@ -6,7 +6,7 @@ export const PLANS = [
     pagesPerPdf: 5,
     price: {
       amount: 0,
-      priceId: {
+      priceIds: {
         test: "",
         production: "",
       },
@@ -19,7 +19,7 @@ export const PLANS = [
     pagesPerPdf: 25,
     price: {
       amount: 13.99,
-      priceId: {
+      priceIds: {
         test: "price_1PFHnpCgpVnhkvFBPHkWjbFe",
         production: "",
       },

@@ -14,9 +14,10 @@ interface PdfFullscreenProps {
 const PdfFullscreen = ({ fileUrl }: PdfFullscreenProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [numPages, setNumPages] = useState<number>();
-  const { width, ref } = useResizeDetector();
 
   const { toast } = useToast();
+
+  const { width, ref } = useResizeDetector();
 
   return (
     <Dialog
@@ -43,8 +44,8 @@ const PdfFullscreen = ({ fileUrl }: PdfFullscreenProps) => {
               }
               onLoadError={() => {
                 toast({
-                  title: "Error Loading PDF",
-                  description: "Please try again",
+                  title: "Error loading PDF",
+                  description: "Please try again later",
                   variant: "destructive",
                 });
               }}

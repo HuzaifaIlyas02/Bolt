@@ -1,9 +1,10 @@
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
+
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { PineconeStore } from "@langchain/pinecone";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { PineconeStore } from "langchain/vectorstores/pinecone";
 import { getPineconeClient } from "@/lib/pinecone";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { PLANS } from "@/config/stripe";
@@ -12,8 +13,7 @@ const f = createUploadthing();
 
 const middleware = async () => {
   const { getUser } = getKindeServerSession();
-
-  const user = await getUser();
+  const user = getUser();
 
   if (!user || !user.id) throw new Error("Unauthorized");
 
@@ -46,7 +46,6 @@ const onUploadComplete = async ({
       key: file.key,
       name: file.name,
       userId: metadata.userId,
-      // url: `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`,
       url: file.url,
       uploadStatus: "PROCESSING",
     },
@@ -54,14 +53,18 @@ const onUploadComplete = async ({
 
   try {
     const response = await fetch(file.url);
+
     const blob = await response.blob();
+
     const loader = new PDFLoader(blob);
+
     const pageLevelDocs = await loader.load();
-    console.log(pageLevelDocs);
+
     const pagesAmt = pageLevelDocs.length;
 
     const { subscriptionPlan } = metadata;
     const { isSubscribed } = subscriptionPlan;
+
     const isProExceeded =
       pagesAmt > PLANS.find((plan) => plan.name === "Pro")!.pagesPerPdf;
     const isFreeExceeded =
@@ -77,16 +80,20 @@ const onUploadComplete = async ({
         },
       });
     }
+
     // vectorize and index entire document
     const pinecone = await getPineconeClient();
     const pineconeIndex = pinecone.Index("bolt");
+
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
     });
+
     await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
       pineconeIndex,
       namespace: createdFile.id,
     });
+
     await db.file.update({
       data: {
         uploadStatus: "SUCCESS",
@@ -96,7 +103,6 @@ const onUploadComplete = async ({
       },
     });
   } catch (err) {
-    console.log(err);
     await db.file.update({
       data: {
         uploadStatus: "FAILED",
