@@ -45,8 +45,8 @@ export function constructMetadata({
       creator: "@m_huzaifa_25",
     },
     icons,
-    metadataBase: new URL("http://localhost:3000/"),
-    themeColor: "",
+    metadataBase: new URL("https://bolt-tau.vercel.app/"),
+    themeColor: "#FFF",
     ...(noIndex && {
       robots: {
         index: false,
