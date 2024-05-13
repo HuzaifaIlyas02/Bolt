@@ -45,7 +45,7 @@ export function constructMetadata({
       creator: "@m_huzaifa_25",
     },
     icons,
-    metadataBase: new URL("https://bolt-xi.vercel.app"),
+    metadataBase: new URL("https://bolt-five.vercel.app"),
     themeColor: "#FFF",
     ...(noIndex && {
       robots: {
