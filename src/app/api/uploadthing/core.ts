@@ -3,11 +3,11 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
-import { getPineconeClient } from "@/lib/pinecone";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { PineconeStore } from "@langchain/pinecone";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { PLANS } from "@/config/stripe";
+import { pc } from "@/lib/pinecone";
 
 const f = createUploadthing();
 
@@ -80,15 +80,24 @@ const onUploadComplete = async ({
         },
       });
     }
+    console.log(isSubscribed);
 
     // vectorize and index entire document
-    const pinecone = await getPineconeClient();
-    const pineconeIndex = pinecone.Index("bolt");
+
+    // const pinecone = new Pinecone();
+
+    // const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX_NAME!);
+
+    const pineconeIndex = pc.Index(process.env.PINECONE_INDEX_NAME!);
 
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
     });
 
+    console.log("Indexing documents in Pinecone...");
+    console.log(embeddings);
+
+    // Add documents to PineconeStore
     await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
       pineconeIndex,
       namespace: createdFile.id,
@@ -103,6 +112,7 @@ const onUploadComplete = async ({
       },
     });
   } catch (err) {
+    console.error("Error indexing documents in Pinecone:", err);
     await db.file.update({
       data: {
         uploadStatus: "FAILED",

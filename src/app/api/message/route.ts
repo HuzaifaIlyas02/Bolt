@@ -1,11 +1,13 @@
 import { db } from "@/db";
 import { openai } from "@/lib/openai";
-import { getPineconeClient } from "@/lib/pinecone";
+// import { initPinecone, getPineconeIndex } from "@/lib/pinecone";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { PineconeStore } from "@langchain/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
 import { NextRequest } from "next/server";
+import { pc } from "@/lib/pinecone";
 
 import { OpenAIStream, StreamingTextResponse } from "ai";
 
@@ -46,12 +48,15 @@ export const POST = async (req: NextRequest) => {
     openAIApiKey: process.env.OPENAI_API_KEY,
   });
 
-  const pinecone = await getPineconeClient();
-  const pineconeIndex = pinecone.Index("bolt");
+  // Replace 'your_index_name' with the actual name of your index
+  // const pinecone = new Pinecone();
+
+  // const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX_NAME!);
+
+  const pineconeIndex = pc.Index(process.env.PINECONE_INDEX_NAME!);
 
   const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
     pineconeIndex,
-    namespace: file.id,
   });
 
   const results = await vectorStore.similaritySearch(message, 4);

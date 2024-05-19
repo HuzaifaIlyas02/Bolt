@@ -13,6 +13,7 @@ export async function getUserSubscriptionPlan() {
   const user = getUser();
 
   if (!user.id) {
+    console.log("example log");
     return {
       ...PLANS[0],
       isSubscribed: false,
