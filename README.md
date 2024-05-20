@@ -64,7 +64,7 @@ To run the project locally, follow these steps:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/yourusername/bolt.git
+   git clone git@github.com:HuzaifaIlyas02/Bolt.git
    cd bolt
 
    ```
